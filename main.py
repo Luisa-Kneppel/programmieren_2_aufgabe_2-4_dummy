@@ -23,4 +23,4 @@ with col1:
 
 with col2:
     st.image(Image.open(picture_path), caption=current_user)
-    
+

@@ -1,0 +1,10 @@
+[project]
+name = "programmieren-2-aufgabe-2-4-dummy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "streamline>=1.1.1",
+    "streamlit>=1.57.0",
+]

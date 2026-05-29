@@ -45,4 +45,3 @@ def find_person_data_by_name(suchstring):
 if __name__=="__main__":
     my_person_db = load_person_data()
     print(get_person_list(my_person_db))
-

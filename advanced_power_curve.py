@@ -43,6 +43,12 @@ def find_all_windows(df, window_list, umrechnungsfaktor = 1):
         "best_power": power_list
         })
 
+    df_power = df_power.dropna() #ungültige Werte entfernt die Nan ausgeben
+
+    df_power["best_power"] = df_power["best_power"].cummin()
+    # die anstiege in der Leistungskurve entfernen, da sie nicht realistisch sind,
+    # sondern nur durch Messfehler entstehen können
+
     return df_power
 
 def make_power_curve(df_power):
@@ -60,23 +66,29 @@ def make_power_curve(df_power):
                  "5:00", "10:00", "20:00","1:00:00", "2:00:00"]
     #tick ist einfach Strich auf der Achse und ticktext ist die Beschriftung dieses Strichs
 
-    fig.update_xaxes(type="log", tickvals=tick_values, ticktext=tick_text, title="Zeit")
+    fig.update_xaxes(
+        type="log", tickvals=tick_values, ticktext=tick_text,
+        title="Zeit", showgrid=True, gridcolor="lightgray")
     # tickvals ist Befehl, wo die Striche auf der x-Achse sein sollen,
     # ticktext ist Befehl, wie die Beschriftung dieser Striche sein soll
 
-    fig.update_yaxes(title="Leistung in Watt")
+    fig.update_yaxes(
+        title="Leistung in Watt",showgrid=True, gridcolor="lightgray")
 
     fig.update_traces(line=dict(width=3))
 
+
+    fig.update_layout(
+        plot_bgcolor="white", paper_bgcolor="white")
     return fig
 
 if __name__ == "__main__":
     df = read_data()
-    #window_list = [1, 5, 10, 30, 60, 120, 300, 600]
-    #window_list = [10, 20, 30, 60, 120, 300, 1200, 3600, 7200]
-    window_list = np.arange(1, 7201)
+    window_list = np.arange(1, len(df))
     df_power = find_all_windows(df, window_list)
-    print(df_power)
+    print(df_power[df_power["best_power"].diff() > 0])
+    # test ob es steigungen in der Leistungskurve gibt, wollen wir nicht
+    #print(df_power)
     fig = make_power_curve(df_power)
     fig.show()
 

@@ -1,6 +1,5 @@
 import json
 
-
 def load_person_data():
     """A Function that knows where the person database is and returns a dictionary with the persons"""
     file = open("data/person_db.json")

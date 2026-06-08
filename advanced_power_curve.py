@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-def read_data():
+def read_data_for_power_curve():
     df = pd.read_csv("data/activities/activity.csv", sep=",")
     df["time in seconds"] = np.arange(len(df))
     df["time in minutes"] = df["time in seconds"]/60

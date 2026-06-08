@@ -7,9 +7,9 @@ from PIL import Image
 
 from advanced_power_curve import find_all_windows
 from advanced_power_curve import make_power_curve
-from advanced_power_curve import read_data
+from advanced_power_curve import read_data_for_power_curve
 
-'''person_dict = read_data.load_person_data()
+person_dict = read_data.load_person_data()
 person_names = read_data.get_person_list(person_dict)
 
 st.write("# EKG APP")
@@ -29,11 +29,11 @@ with col1:
     st.write("Der Pfad ist:", picture_path)
 
 with col2:
-    st.image(Image.open(picture_path), caption=current_user)'''
+    st.image(Image.open(picture_path), caption=current_user)
 
 #Implementierung der Power-Curve
 
-df = read_data()
+df = read_data_for_power_curve()
 power_input = df["PowerOriginal"].to_numpy()
 time_input = df["time in seconds"].to_numpy()
 

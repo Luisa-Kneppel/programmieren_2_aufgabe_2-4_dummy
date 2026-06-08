@@ -11,34 +11,34 @@ def read_data():
 
 
 '''umrechnungsfaktor= Messwerte pro Sekunde, 
-z.B. 1 Messwert pro Sekunde, dann ist umrechnungsfaktor = 1'''
+z.B. 1 Messwert pro Sekunde, dann ist umrechnungsfaktor = 1, wir setzen ihn aber nicht fix auf 1, 
+da es sonst zu Fehlern kommt, wenn die Abstände nicht genau 1 sekunde betragen => time_data'''
 
-def find_best_power(df, windowsize_seconds, umrechnungsfaktor = 1): 
-    # windowsize hat die Einheit Sekunde
-    # Umrechnungsfaktor hat die Einheit Messwerte pro Sekunde
-    # beides multiplizieren, damit wir die Anzahl der Zeilen bekommen
-    # Anzahl brauchen wir für das rolling mean
+def find_best_power(power_data, time_data, windowsize_seconds): 
 
-    windowsize_rows = int(windowsize_seconds * umrechnungsfaktor)
-    #Festergröße in sekunden wird in eine Festergröße in Zeilen umgerechnet
-    # int, da wir nur ganzahlige Zeilen haben können
-
-    rolling_mean = df["PowerOriginal"].rolling(windowsize_rows).mean()
+    # jetzt stellen wir sicher, dass die Funktion funktioniert, egal ob Series oder Array übergeben wird
+    power_series = pd.Series(power_data)
+    
+    # Code flexibel für unregelmäßige Abstände machen: die Sekunden - Spalte wird in ein echtes Zeitformat für Pandas umgewandelt!
+    # dh. durch das .index wird nicht mehr die Zeilennummer verwendet, sondern die echten Zeiten
+    power_series.index = pd.to_timedelta(time_data, unit='s')    
+    Zeitfenster = str(windowsize_seconds) + "s"     # Bsp. steht dann "3s"
+    rolling_mean = power_series.rolling(Zeitfenster).mean()
+    
     max_power = rolling_mean.max()
 
     return max_power
 
-def find_all_windows(df, window_list, umrechnungsfaktor = 1):
+def find_all_windows(power_data, time_data, window_list):
     power_list = [] # leere Liste für die besten Leistungen der verschiedenen Fenstergrößen
 
     for windowsize_seconds in window_list: #geht die gewünschte Dauer durch
         #window list enhält die gewünschten Zeitpunkte in einer Liste
 
-        best_power = find_best_power(df, windowsize_seconds, umrechnungsfaktor)
-
+        best_power = find_best_power (power_data, time_data, windowsize_seconds)
         power_list.append(best_power)
     
-    df_power = pd.DataFrame({
+    df_power = pd.DataFrame({           #das ist der gesuchte DataFrame, der die Zeitpunkte und die besten Leistungen enthält
         "time in seconds": window_list,
         "best_power": power_list
         })
@@ -82,13 +82,24 @@ def make_power_curve(df_power):
         plot_bgcolor="white", paper_bgcolor="white")
     return fig
 
+
 if __name__ == "__main__":
     df = read_data()
-    window_list = np.arange(1, len(df))
-    df_power = find_all_windows(df, window_list)
+    power_input = df["PowerOriginal"].to_numpy()
+    # das .to_numpy wandelt es in ein reines numpy array um 
+    # -> Funktion bekommt nicht gesamtes df, nur mehr die Zahlen daraus (macht es flexibel)
+    time_input = df["time in seconds"].to_numpy()
+
+    # wir brauchen die letzte/maximale Sekunde aus den Daten:
+    maximal_seconds = int(time_input.max())
+    window_list = np.arange(1, maximal_seconds + 1) # alle Sekunden von 1 bis max Dauer 
+
+
+    df_power = find_all_windows(power_input, time_input, window_list)
     print(df_power[df_power["best_power"].diff() > 0])
-    # test ob es steigungen in der Leistungskurve gibt, wollen wir nicht
-    #print(df_power)
+
     fig = make_power_curve(df_power)
     fig.show()
 
+'''Für jede Dauer wird ein gleitender Durchschnitt berechnet, 
+davon wird der Maximalwert genommen, und alle Maximalwerte zusammen ergeben die Power-Curve.'''

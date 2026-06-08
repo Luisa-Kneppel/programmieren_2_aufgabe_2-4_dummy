@@ -12,4 +12,5 @@ Nachdem die Funktionen auf ihre Richtigkeit geprüft haben, haben wir sie in uns
 Die Streamlit App wird in zwei Tabs unterteilt: „EKG – Data“ und „Power – Data“. Im ersten Tab wird die EKG – Visualisierung gezeigt. Im zweiten Tab wird zu Beginn die berechnete mittlere und maximale Leistung angezeigt. Darunter wird der Verlauf von Leistung und Herzfrequenz abgebildet. Über ein interaktives Eingabefeld kann der Nutzer seine maximale Herzfrequenz eingeben, daraufhin wird die Zonen – Verteilung berechnet, im Diagramm dargestellt sowie die statistische Auswertung angezeigt.
 Um die Streamlit App zu starten, muss im Terminal „streamlit run interactive_plot.py“ eingegeben werden und mit Enter bestätigt werden. 
 
-![Screenshot](/screenshot.png)
+![Screenshot](/screenshot_Abgabe-3_Bild2.png)
+![Screenshot](/screenshot_Abgabe-3_Bild1.png)

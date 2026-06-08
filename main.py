@@ -1,8 +1,15 @@
+import numpy as np
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 import read_data 
 from PIL import Image
 
-person_dict = read_data.load_person_data()
+from advanced_power_curve import find_all_windows
+from advanced_power_curve import make_power_curve
+from advanced_power_curve import read_data
+
+'''person_dict = read_data.load_person_data()
 person_names = read_data.get_person_list(person_dict)
 
 st.write("# EKG APP")
@@ -22,5 +29,19 @@ with col1:
     st.write("Der Pfad ist:", picture_path)
 
 with col2:
-    st.image(Image.open(picture_path), caption=current_user)
+    st.image(Image.open(picture_path), caption=current_user)'''
 
+#Implementierung der Power-Curve
+
+df = read_data()
+power_input = df["PowerOriginal"].to_numpy()
+time_input = df["time in seconds"].to_numpy()
+
+maximal_seconds = int(time_input.max())
+window_list = np.arange(1, maximal_seconds + 1) 
+
+df_power = find_all_windows(power_input, time_input, window_list)
+print(df_power.head()) #anzeigen der ersten 5 Zeilen des DataFrames
+
+fig = make_power_curve(df_power)
+fig.show()

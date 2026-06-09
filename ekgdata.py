@@ -2,6 +2,8 @@ import json
 import pandas as pd
 import plotly.express as px
 
+import plotly.graph_objects as go
+
 # Klasse EKG-Data für Peakfinder, die uns ermöglicht peaks zu finden
 
 class EKGdata:
@@ -16,13 +18,6 @@ class EKGdata:
         self.df = self.df.iloc[:5000]  # Entferne die erste Zeile, da sie nur die Spaltennamen enthält
         self.peaks = []
 
-    '''def plot_time_series(self):
-
-        # Erstellte einen Line Plot, der ersten 2000 Werte mit der Zeit aus der x-Achse
-        df_plot["is_peak"] = False
-        df_plot.loc[self.peaks, "is_peak"] = True
-        self.fig = px.line(self.df.head(2000), x="Zeit in ms", y="Messwerte in mV", title="EKG Zeitreihe", color="is_peak")
-        return self.fig'''
 
     def load_by_id(self, id): #Instanziiert einen EKG-Test anhand der ID und der Personen-Datenbank
         with open("data/person_db.json", "r", encoding="utf-8") as file: #erstmal die Personendatenbank öffnen
@@ -37,7 +32,7 @@ class EKGdata:
 
     def find_peaks(self, threshold, respacing_factor=5):
         
-        series = series = self.df["Messwerte in mV"] # die Spalte mit den EKG-Werten als Series speichern 
+        series = self.df["Messwerte in mV"] # die Spalte mit den EKG-Werten als Series speichern 
         series = series.iloc[::respacing_factor] # EKG-Daten ausdünnen
         series = series[series > threshold] # Nur Werte über dem Schwellwert behalten
 
@@ -68,32 +63,34 @@ class EKGdata:
         return avg_hr
 
 
-#die Abstände zwischen den Peaks und in Schläge pro Minute um.
+    def plot_time_series(self):
 
-    '''def plot(self):
-        df_plot = self.df.copy() #damit wir den Dataframe nicht verändern
+        # EKG-Kurve
+        limit=2000
 
-        df_plot["is_peak"] = False
-        df_plot.loc[self.peaks, "is_peak"] = True
-
-        fig = px.scatter(
-            df_plot,
-            x="Time in ms",
-            y="EKG in mV",
-            color="is_peak"
+        fig = px.line(
+            self.df.head(2000),
+            x="Zeit in ms",
+            y="Messwerte in mV",
+            title="EKG Zeitreihe"
         )
 
-        fig.show()'''
+        df_plot = self.df.head(limit) # Daten für die ersten 2000 Werte, um die Peaks zu plotten
 
-    def plot_time_series(self):
-        df_plot = self.df.copy() #damit wir den Dataframe nicht verändern
+        peak_df = df_plot.loc[df_plot.index.isin(self.peaks)] # DataFrame mit den Peak-Daten erstellen
 
-        # Erstellte einen Line Plot, der ersten 2000 Werte mit der Zeit aus der x-Achse
-        df_plot["is_peak"] = False
-        df_plot.loc[self.peaks, "is_peak"] = True
-        self.fig = px.line(df_plot.head(2000), x="Zeit in ms", y="Messwerte in mV", title="EKG Zeitreihe", color="is_peak")
-        return self.fig
+        fig.add_trace(
+            go.Scatter(
+                x=peak_df["Zeit in ms"],
+                y=peak_df["Messwerte in mV"],
+                mode="markers",
+                marker=dict(color="red", size=8),
+                name="Peaks"
+            )
+        )
 
+        self.fig = fig
+        return fig
 
 if __name__ == "__main__":
     print("This is a module with some functions to read the EKG data")

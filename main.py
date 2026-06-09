@@ -31,17 +31,3 @@ with col1:
 with col2:
     st.image(Image.open(picture_path), caption=current_user)
 
-#Implementierung der Power-Curve
-
-df = read_data_for_power_curve()
-power_input = df["PowerOriginal"].to_numpy()
-time_input = df["time in seconds"].to_numpy()
-
-maximal_seconds = int(time_input.max())
-window_list = np.arange(1, maximal_seconds + 1) 
-
-df_power = find_all_windows(power_input, time_input, window_list)
-print(df_power.head()) #anzeigen der ersten 5 Zeilen des DataFrames
-
-fig = make_power_curve(df_power)
-fig.show()

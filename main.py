@@ -5,9 +5,10 @@ import streamlit as st
 import read_data 
 from PIL import Image
 
-from advanced_power_curve import find_all_windows
-from advanced_power_curve import make_power_curve
-from advanced_power_curve import read_data_for_power_curve
+#import person.py
+#import ekgdata.py 
+
+
 
 person_dict = read_data.load_person_data()
 person_names = read_data.get_person_list(person_dict)
@@ -31,3 +32,40 @@ with col1:
 with col2:
     st.image(Image.open(picture_path), caption=current_user)
 
+
+
+from person import get_person_data
+from ekgdata import EKGdata
+
+
+def analyse_ekg(person_index, ekg_index, threshold): #indexe für die Auswahl der Person und des EKG-Tests
+    persons = get_person_data() 
+
+    selected_person = persons[person_index] #Person anhand des Index auswählt
+    selected_ekg_test = selected_person.ekg_tests[ekg_index] #EKG-Test anhand des Index auswählt, wie person
+
+    ekg = EKGdata(selected_ekg_test) # ekg als Objekt erstellen
+
+    ekg.find_peaks(threshold) #wieder peaks finden aber nun individuell aus dem Test
+
+    fig = ekg.plot_time_series() #plotten
+
+    return selected_person, ekg, fig 
+
+'''def main(): --> Testblock
+    selected_person, ekg, fig = analyse_ekg( 
+        person_index=0,
+        ekg_index=0,
+        threshold=340
+    )
+
+    print("Ausgewählte Person:")
+    print(selected_person.get_full_name())
+
+    print("EKG-ID:")
+    print(ekg.id)
+
+    print("Anzahl Peaks:")
+    print(len(ekg.peaks))
+
+    fig.show()'''

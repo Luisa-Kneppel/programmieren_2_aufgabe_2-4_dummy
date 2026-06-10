@@ -10,7 +10,7 @@ class EKGdata:
 ## Konstruktor der Klasse soll die Daten einlesen
 
     def __init__(self, ekg_dict):
-        #pass
+
         self.id = ekg_dict["id"]
         self.date = ekg_dict["date"]
         self.data = ekg_dict["result_link"]
@@ -30,7 +30,7 @@ class EKGdata:
 
         
 
-    def find_peaks(self, threshold, respacing_factor=5):
+    def find_peaks(self, threshold, respacing_factor=5): # Funktionso übernommen und nur an Klasse angepasst und Series-Index angepasst
         
         series = self.df["Messwerte in mV"] # die Spalte mit den EKG-Werten als Series speichern 
         series = series.iloc[::respacing_factor] # EKG-Daten ausdünnen
@@ -103,4 +103,3 @@ if __name__ == "__main__":
     peaks = ekg.find_peaks(340)
     fig = ekg.plot_time_series()
     fig.show()
-

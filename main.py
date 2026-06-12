@@ -56,6 +56,7 @@ if person:
         ekg.find_peaks(threshold)
         herzfrequenz = ekg.estimate_hr()
         fig = ekg.plot_time_series()
+        st.write("Die Herzfrequenz beträgt:", herzfrequenz, "bpm")
         st.plotly_chart(fig)    #, use_container_width=True
 
     else:

@@ -1,7 +1,6 @@
 import json
 import pandas as pd
 import plotly.express as px
-
 import plotly.graph_objects as go
 
 # Klasse EKG-Data für Peakfinder, die uns ermöglicht peaks zu finden
@@ -30,7 +29,7 @@ class EKGdata:
 
         
 
-    def find_peaks(self, threshold, respacing_factor=5): # Funktionso übernommen und nur an Klasse angepasst und Series-Index angepasst
+    def find_peaks(self, threshold, respacing_factor=5): # Funktion so übernommen und nur an Klasse angepasst und Series-Index angepasst
         
         series = self.df["Messwerte in mV"] # die Spalte mit den EKG-Werten als Series speichern 
         series = series.iloc[::respacing_factor] # EKG-Daten ausdünnen
@@ -75,7 +74,7 @@ class EKGdata:
         limit=2000
 
         fig = px.line(
-            self.df.head(2000),
+            self.df.head(limit),
             x="Zeit in ms",
             y="Messwerte in mV",
             title="EKG Zeitreihe"
@@ -110,22 +109,3 @@ if __name__ == "__main__":
     fig = ekg.plot_time_series()
     fig.show()
 
-
-
-'''def main(): -->geparkter Testblock
-    selected_person, ekg, fig = analyse_ekg( 
-        person_index=0,
-        ekg_index=0,
-        threshold=340
-    )
-
-    print("Ausgewählte Person:")
-    print(selected_person.get_full_name())
-
-    print("EKG-ID:")
-    print(ekg.id)
-
-    print("Anzahl Peaks:")
-    print(len(ekg.peaks))
-
-    fig.show()'''

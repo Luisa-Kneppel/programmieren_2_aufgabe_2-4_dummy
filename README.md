@@ -14,3 +14,8 @@ Um die Streamlit App zu starten, muss im Terminal „streamlit run interactive_p
 
 ![Screenshot](/screenshot_Abgabe-3_Bild2.png)
 ![Screenshot](/screenshot_Abgabe-3_Bild1.png)
+
+In der 4. Aufgabe haben wir unsere bisherigen Codes mit neuen Modulen erweitert,um eine übersichtliche und verständliche App zu gestallten.
+Zuerst haben wir die Module person.py und ekgdata.py entwickelt. Person.py lädt Personendaten aus der Datei data/person_db.json und erstellt daraus Objekte der Klasse Person. Jedes Objekt der Klasse enthält die personenbezogene Informationen.
+In der Funktion get_person_data() werden alle Personen als Liste zurückgegeben und über get_person_object_by_full_name() anhand von  "Nachname, Vorname" gesucht.
+Ekgdata lädt EKG-Messdaten und speichert sie in einem DataFrame. Die Klasse EKGdata instanziiert einen EKG-Test (mit der ID) inload_by_id und sucht mit der Methode find_peaks, Peaks in den EKG-Daten und  berechnet mit avg_hr daraus die durchschnittliche Herzfrequenz. Mit plot_time_series() wird die EKG-Zeitreihe daraufhin dargestellt. Dabei werden die Messwerte über der Zeit geplottet und die erkannten Peaks werden zusätzlich als rote Punkte markiert, damit die Ausschläge im EKG-Signal direkt sichtbar sind.

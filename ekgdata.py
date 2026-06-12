@@ -50,16 +50,22 @@ class EKGdata:
                 peaks.append(index - respacing_factor)
 
         self.peaks = peaks # Ergebnis als Attribut speichern
+        
+        self.df["is_peak"] = False
+        self.df.loc[self.peaks, "is_peak"] = True 
 
         return peaks
 
-    def calculate_avg_hr(self, df):     # (df)
-        df_peaks =df.loc[df["is peak"] == True]
-        N_peaks = df_peaks["is_peak"].sum() # Anzahl der Peaks
+    def estimate_hr(self):
+        # Berechnet die Herzfrequenz basierend auf den Peaks (Peaks/Minute)
 
-        dt_ms = df_peaks["time in ms"].iloc[-1] - df_peaks["time in ms"].iloc[0] # Zeit in ms zwischen erstem und letztem Peak
-        dt_min = dt_ms / (1000*60)
-        avg_hr = N_peaks / dt_min # durchschnittliche Herzfrequenz in bpm
+        self.df_peaks = self.df.loc[self.df["is_peak"] == True]
+
+        N_peaks = self.df_peaks["is_peak"].sum()      
+        dt_ms = self.df_peaks["Zeit in ms"].iloc[-1] - self.df_peaks["Zeit in ms"].iloc[0]
+        dt_min = dt_ms/(1000*60)
+
+        avg_hr = N_peaks/dt_min # durchschnittliche Herzfrequenz in bpm
         return avg_hr
 
 
@@ -103,3 +109,23 @@ if __name__ == "__main__":
     peaks = ekg.find_peaks(340)
     fig = ekg.plot_time_series()
     fig.show()
+
+
+
+'''def main(): -->geparkter Testblock
+    selected_person, ekg, fig = analyse_ekg( 
+        person_index=0,
+        ekg_index=0,
+        threshold=340
+    )
+
+    print("Ausgewählte Person:")
+    print(selected_person.get_full_name())
+
+    print("EKG-ID:")
+    print(ekg.id)
+
+    print("Anzahl Peaks:")
+    print(len(ekg.peaks))
+
+    fig.show()'''

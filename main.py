@@ -4,14 +4,15 @@ import plotly.express as px
 import streamlit as st
 import read_data 
 from PIL import Image
-
-#import person.py
-#import ekgdata.py 
-
+from person import get_person_data, get_person_object_by_full_name
+from ekgdata import EKGdata
 
 
-person_dict = read_data.load_person_data()
-person_names = read_data.get_person_list(person_dict)
+person_objects = get_person_data()
+person_names = []
+for person in person_objects:
+    name = person.get_full_name()
+    person_names.append(name)
 
 st.write("# EKG APP")
 
@@ -20,52 +21,42 @@ with col1:
     st.header("Versuchsperson auswählen")
 
     current_user = st.selectbox(
-        'Versuchsperson',
-        options = person_names, key="sbVersuchsperson")
+         'Versuchsperson',
+         options = person_names, key="sbVersuchsperson")
     
-    if current_user in person_names:
-        picture_path = read_data.find_person_data_by_name(current_user)["picture_path"]
-    
-    st.write("Der Name ist:", current_user)
-    st.write("Der Pfad ist:", picture_path)
+    person = get_person_object_by_full_name(current_user)
+
+    if person: # sicherstellen dass sie existiert, bevor man Daten abfragen kann
+
+        st.write("Der Name ist:", current_user)
+        st.write("Der Pfad ist:", person.picture_path)
 
 with col2:
-    st.image(Image.open(picture_path), caption=current_user)
+    if person:
+        st.image(person.get_image(), caption = current_user)
 
+if person:
+    st.header("EKG Analyse")
 
+    if len(person.ekg_tests) > 0:
+        test_Auswahl = []
+        
+        # Durch alle EKG-Tests der ausgewählten Person gehen
+        for t in person.ekg_tests:
+            test_text = t['date']    # Benennt die Optionen die zur Auswahl stehen
+            test_Auswahl.append(test_text)
+            
+        selected_test = st.selectbox("Wähle einen EKG-Test aus:", options=test_Auswahl)     # Auswahlfeld in Streamlit einbauen
 
-from person import get_person_data
-from ekgdata import EKGdata
+        test_index = test_Auswahl.index(selected_test)
+        ekg_test = person.ekg_tests[test_index]
 
+        ekg = EKGdata(ekg_test)
+        threshold = 340
+        ekg.find_peaks(threshold)
+        herzfrequenz = ekg.estimate_hr()
+        fig = ekg.plot_time_series()
+        st.plotly_chart(fig)    #, use_container_width=True
 
-def analyse_ekg(person_index, ekg_index, threshold): #indexe für die Auswahl der Person und des EKG-Tests
-    persons = get_person_data() 
-
-    selected_person = persons[person_index] #Person anhand des Index auswählt
-    selected_ekg_test = selected_person.ekg_tests[ekg_index] #EKG-Test anhand des Index auswählt, wie person
-
-    ekg = EKGdata(selected_ekg_test) # ekg als Objekt erstellen
-
-    ekg.find_peaks(threshold) #wieder peaks finden aber nun individuell aus dem Test
-
-    fig = ekg.plot_time_series() #plotten
-
-    return selected_person, ekg, fig 
-
-'''def main(): --> Testblock
-    selected_person, ekg, fig = analyse_ekg( 
-        person_index=0,
-        ekg_index=0,
-        threshold=340
-    )
-
-    print("Ausgewählte Person:")
-    print(selected_person.get_full_name())
-
-    print("EKG-ID:")
-    print(ekg.id)
-
-    print("Anzahl Peaks:")
-    print(len(ekg.peaks))
-
-    fig.show()'''
+    else:
+        st.warning("Für diese Person gibt es in der Datenbank keine EKG-Tests.")
